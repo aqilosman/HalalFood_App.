@@ -35,12 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
     
     try {
-      // 1. Cuba login biasa
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-    } on FirebaseAuthException catch (e) {
-      // 2. Jika gagal (kes email rekaan), semak password di Firestore
+      // 1. SEMAK FIRESTORE DAHULU (Jadikan Firestore sebagai Master Password)
       final userQuery = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: email)
@@ -49,18 +44,35 @@ class _LoginPageState extends State<LoginPage> {
 
       if (userQuery.docs.isNotEmpty) {
         final userData = userQuery.docs.first.data();
-        final customPass = userData['customPassword'];
-        
-        if (customPass != null && customPass == password) {
-          if (!mounted) return;
-          // Login berjaya melalui bypass Firestore - GUNA ID DOKUMEN SEBAGAI UID
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(manualUid: userQuery.docs.first.id)));
+        final masterPass = userData['customPassword'];
+
+        // Jika password yang ditaip TAK SAMA dengan dalam Firestore, terus REJECT.
+        // Ini memastikan password lama yang mungkin masih ada dalam Firebase Auth terbatal.
+        if (masterPass != null && masterPass != password) {
+          _showError('Incorrect email or password');
+          setState(() => _isLoading = false);
           return;
         }
       }
-      _showError('Incorrect email or password');
+
+      // 2. Jika password Firestore betul (atau record tak jumpa), cuba login biasa
+      try {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+        if (!mounted) return;
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+      } on FirebaseAuthException {
+        // 3. Fallback: Jika Firebase Auth gagal (kes akaun manual/demo), tetapi Firestore OK
+        if (userQuery.docs.isNotEmpty) {
+          if (!mounted) return;
+          Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) => HomePage(manualUid: userQuery.docs.first.id)
+          ));
+          return;
+        }
+        _showError('Incorrect email or password');
+      }
     } catch (e) {
-      _showError('Error: $e');
+      _showError('An error occurred. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

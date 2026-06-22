@@ -46,22 +46,28 @@ class _HomePageState extends State<HomePage> {
           StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance.collection('users').doc(currentUserId).snapshots(),
             builder: (context, snapshot) {
-              bool isProfileIncomplete = false;
+              bool showRedDot = false;
               if (snapshot.hasData && snapshot.data!.exists) {
                 var data = snapshot.data!.data() as Map<String, dynamic>;
-                if (data['address'] == null || data['address'].toString().isEmpty) {
-                  isProfileIncomplete = true;
-                }
+                
+                // Show dot if Welcome is not cleared
+                bool isWelcomeCleared = data['isWelcomeCleared'] ?? false;
+                if (!isWelcomeCleared) showRedDot = true;
+
+                // Show dot if Profile is incomplete AND alert not cleared
+                bool isAlertCleared = data['isAlertCleared'] ?? false;
+                bool isProfileIncomplete = data['address'] == null || data['address'].toString().isEmpty;
+                if (isProfileIncomplete && !isAlertCleared) showRedDot = true;
               }
 
               return Stack(
                 alignment: Alignment.center,
                 children: [
                   IconButton(
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsListPage())), 
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationsListPage(manualUid: widget.manualUid))), 
                     icon: const Icon(Icons.notifications_none_outlined, size: 28, color: Colors.white)
                   ),
-                  if (isProfileIncomplete)
+                  if (showRedDot)
                     Positioned(
                       right: 12,
                       top: 12,

@@ -18,7 +18,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   double _minRating = 0.0;
 
   final List<String> _categories = ['All', 'Halal', 'Non Halal', 'Vege'];
-  final List<String> _locations = ['All', 'Selangor', 'Kuala Lumpur', 'Pahang', 'Johor', 'Penang'];
+  final List<String> _locations = [
+    'All', 'Johor', 'Kedah', 'Kelantan', 'Kuala Lumpur', 'Labuan', 'Melaka', 
+    'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 'Perlis', 'Putrajaya', 
+    'Sabah', 'Sarawak', 'Selangor', 'Terengganu'
+  ];
 
   @override
   void initState() {

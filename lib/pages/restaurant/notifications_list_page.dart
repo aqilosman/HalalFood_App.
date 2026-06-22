@@ -4,83 +4,97 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../profile/personal_info_page.dart';
 
 class NotificationsListPage extends StatefulWidget {
-  const NotificationsListPage({super.key});
+  final String? manualUid;
+  const NotificationsListPage({super.key, this.manualUid});
 
   @override
   State<NotificationsListPage> createState() => _NotificationsListPageState();
 }
 
 class _NotificationsListPageState extends State<NotificationsListPage> {
-  bool _isCleared = false;
+  Future<void> _handleClearAll(String userId) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'isWelcomeCleared': true,
+        'isAlertCleared': true, // To hide the incomplete profile dot as well
+      });
+    } catch (e) {
+      debugPrint("Error clearing notifications: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final currentUserId = widget.manualUid ?? user?.uid;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text('Notifications', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        actions: [
-          if (!_isCleared)
-            TextButton(
-              onPressed: () => setState(() => _isCleared = true),
-              child: const Text('Clear All', style: TextStyle(color: Colors.redAccent)),
-            ),
-        ],
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').doc(currentUserId).snapshots(),
+      builder: (context, snapshot) {
+        bool isWelcomeCleared = false;
+        bool isAlertCleared = false;
+        bool isProfileIncomplete = false;
 
-          List<Map<String, String>> currentNotifications = [];
-
-          bool isProfileIncomplete = false;
-          if (snapshot.hasData && snapshot.data!.exists) {
-            var data = snapshot.data!.data() as Map<String, dynamic>;
-            if (data['address'] == null || data['address'].toString().isEmpty) {
-              isProfileIncomplete = true;
-            }
+        if (snapshot.hasData && snapshot.data!.exists) {
+          var data = snapshot.data!.data() as Map<String, dynamic>;
+          isWelcomeCleared = data['isWelcomeCleared'] ?? false;
+          isAlertCleared = data['isAlertCleared'] ?? false;
+          if (data['address'] == null || data['address'].toString().isEmpty) {
+            isProfileIncomplete = true;
           }
+        }
 
-          if (isProfileIncomplete) {
-            currentNotifications.add({
-              'title': 'Incomplete Profile',
-              'desc': 'Please update your address to facilitate restaurant discovery and delivery.',
-              'time': 'Just now',
-              'type': 'alert'
-            });
-          }
+        List<Map<String, String>> currentNotifications = [];
 
-          if (!_isCleared) {
-            currentNotifications.add({
-              'title': 'Welcome',
-              'desc': 'Thank you for joining HalalEats! Start exploring halal gems around you.',
-              'time': '1 day ago',
-              'type': 'info'
-            });
-          }
+        if (isProfileIncomplete && !isAlertCleared) {
+          currentNotifications.add({
+            'title': 'Incomplete Profile',
+            'desc': 'Please update your address to facilitate restaurant discovery and delivery.',
+            'time': 'Just now',
+            'type': 'alert'
+          });
+        }
 
-          if (currentNotifications.isEmpty) {
-            return _buildEmptyState();
-          }
+        if (!isWelcomeCleared) {
+          currentNotifications.add({
+            'title': 'Welcome',
+            'desc': 'Thank you for joining HalalEats! Start exploring halal gems around you.',
+            'time': '1 day ago',
+            'type': 'info'
+          });
+        }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: currentNotifications.length,
-            itemBuilder: (context, index) {
-              final item = currentNotifications[index];
-              return _buildNotificationItem(item, onTap: item['type'] == 'alert' 
-                  ? () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PersonalInfoPage()))
-                  : null);
-            },
-          );
-        },
-      ),
+        return Scaffold(
+          backgroundColor: const Color(0xFFF9FAFB),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.black),
+            title: const Text('Notifications', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            actions: [
+              if (currentNotifications.isNotEmpty)
+                TextButton(
+                  onPressed: () => _handleClearAll(currentUserId!),
+                  child: const Text('Clear All', style: TextStyle(color: Colors.redAccent)),
+                ),
+            ],
+          ),
+          body: snapshot.connectionState == ConnectionState.waiting 
+            ? const Center(child: CircularProgressIndicator())
+            : currentNotifications.isEmpty 
+              ? _buildEmptyState()
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: currentNotifications.length,
+                  itemBuilder: (context, index) {
+                    final item = currentNotifications[index];
+                    return _buildNotificationItem(item, onTap: item['type'] == 'alert' 
+                        ? () => Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalInfoPage(manualUid: currentUserId)))
+                        : null);
+                  },
+                ),
+        );
+      }
     );
   }
 

@@ -5,6 +5,7 @@ import 'dashboard_overview.dart';
 import 'my_restaurant.dart';
 import 'owner_bookings_page.dart'; // NEW
 import '../../widgets/app_drawer.dart';
+import '../restaurant/notifications_list_page.dart';
 
 class OwnerScreen extends StatefulWidget {
   final String? manualUid; 
@@ -61,6 +62,43 @@ class _OwnerScreenState extends State<OwnerScreen> {
               _getPageTitle(), 
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)
             ),
+            actions: [
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance.collection('users').doc(currentUserId).snapshots(),
+                builder: (context, snapshot) {
+                  bool showRedDot = false;
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+                    
+                    // Show dot if Welcome is not cleared
+                    bool isWelcomeCleared = data['isWelcomeCleared'] ?? false;
+                    if (!isWelcomeCleared) showRedDot = true;
+
+                    // Show dot if Profile is incomplete AND alert not cleared
+                    bool isAlertCleared = data['isAlertCleared'] ?? false;
+                    bool isProfileIncomplete = data['address'] == null || data['address'].toString().isEmpty;
+                    if (isProfileIncomplete && !isAlertCleared) showRedDot = true;
+                  }
+
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationsListPage(manualUid: widget.manualUid))), 
+                        icon: const Icon(Icons.notifications_none_outlined, size: 28, color: Colors.white)
+                      ),
+                      if (showRedDot)
+                        Positioned(
+                          right: 12,
+                          top: 12,
+                          child: Container(padding: const EdgeInsets.all(4), decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), constraints: const BoxConstraints(minWidth: 8, minHeight: 8)),
+                        ),
+                    ],
+                  );
+                }
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
           drawer: AppDrawer(manualUid: widget.manualUid),
           body: Stack(

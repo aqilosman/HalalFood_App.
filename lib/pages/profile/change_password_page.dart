@@ -94,26 +94,32 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
       if (currentUserId == null) throw 'User session error';
 
-      // 1. Dapatkan data user dari Firestore untuk semak password lama
+      // 1. Dapatkan data user dari Firestore untuk semak password lama (Master check)
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUserId).get();
       if (!userDoc.exists) throw 'User document not found';
       
       final userData = userDoc.data()!;
       final savedPass = userData['customPassword'] ?? "";
 
-      // 2. Semak jika password lama betul (untuk akaun demo/bypass)
+      // 2. Semak jika password lama betul mengikut rekod Firestore
       if (_currentController.text != savedPass) {
         throw 'Current password is incorrect';
       }
 
       // 3. Update Firebase Auth (Jika ada session aktif)
       if (authUser != null) {
-        final cred = EmailAuthProvider.credential(email: authUser.email!, password: _currentController.text);
-        await authUser.reauthenticateWithCredential(cred);
-        await authUser.updatePassword(_newController.text);
+        try {
+          final cred = EmailAuthProvider.credential(email: authUser.email!, password: _currentController.text);
+          await authUser.reauthenticateWithCredential(cred);
+          await authUser.updatePassword(_newController.text.trim());
+        } catch (authError) {
+          // Jika gagal update Auth (mungkin password sedia ada berbeza), kita abaikan 
+          // dan teruskan update Firestore sebagai Master.
+          debugPrint("Auth sync skipped: $authError");
+        }
       }
       
-      // 4. Update Firestore - HANYA tukar customPassword, data lain KEKAL
+      // 4. Update Firestore - Ini adalah Master Password yang akan disemak semasa Login
       await FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
         'customPassword': _newController.text.trim(),
       });
