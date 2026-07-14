@@ -82,3 +82,16 @@ flutter run
 🥇 Champion – TECHNOCONNECT 2026 App Development Competition (Universiti Malaysia Kelantan)
 
 ---
+
+# 👤 Author
+
+**Muhammad Aqil Bin Osman**
+
+Information Technology Undergraduate  
+Universiti Malaysia Kelantan
+
+📧 Email: aqilosman2001@gmail.com
+
+💼 LinkedIn: https://linkedin.com/in/aqilosman
+
+🐙 GitHub: https://github.com/aqilosman
