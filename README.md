@@ -1,33 +1,109 @@
-# 🥗 HalalEats - Premium Halal Discovery & Booking App
+# 🥗 HalalEats – Premium Halal Discovery & Booking App
 
-HalalEats adalah aplikasi mudah alih premium yang membantu pengguna mencari restoran halal yang disahkan, melihat bukti sijil halal, dan membuat tempahan meja secara efisien.
+HalalEats is a premium cross-platform mobile application designed to help users discover verified halal restaurants, view halal certification, and make table reservations conveniently. The application also provides restaurant owners with tools to manage their restaurants, bookings, and customer interactions.
 
-## 👥 Akaun Ujian (Demo Credentials)
-Gunakan akaun di bawah untuk menguji fungsi peranan (Role) yang berbeza:
+---
+
+# 👥 Demo Credentials
+
+Use the following demo accounts to explore the different user roles within the application.
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
 | **Restaurant Owner** | aqil@test.com | password123 |
 | **Regular Customer** | adam@test.com | password123 |
 
-## 💡 Nota Penting untuk Penguji (Evaluation Note)
-Oleh kerana had kuota pada pelan percuma **Firebase Storage**, fungsi muat naik fail melalui **"Pick from Gallery"** mungkin akan mengalami gangguan akses. 
+---
 
-**Saranan Pengujian:** Sila gunakan fungsi **"Paste Direct URL"** yang disediakan dalam borang (Restoran, Sijil Halal, & Menu). Anda boleh menampal mana-mana pautan imej dari internet untuk melihat paparan data yang selari (*tally*) secara real-time.
+# 💡 Evaluation Note
 
-## 🚀 Cara Menjalankan Aplikasi (Setup)
-1. **Clone Repository**: `git clone https://github.com/Sleven915/HalalFood_App.git`
-2. **Install Library**: Jalankan perintah `flutter pub get` di terminal perisian anda.
-3. **Run App**: Sambungkan peranti Android/Emulator dan jalankan perintah `flutter run`.
+Due to the storage quota limitations of the free **Firebase Storage** plan, uploading images using the **"Pick from Gallery"** feature may occasionally fail.
 
-## ✨ Ciri-Ciri Utama (Key Features)
-*   **Verification System**: Pemilik boleh memuat naik/menampal URL Sijil Halal sebagai bukti sahih.
-*   **Hybrid Booking**: Sistem tempahan meja manual dengan bantuan rujukan waktu operasi yang tersusun kemas.
-*   **Owner Dashboard**: Statistik real-time bagi jumlah tempahan dan ulasan pelanggan.
-*   **Permissions Logic**: Sekatan ulasan bagi pemilik restoran (Integriti Data) dan pengurusan menu eksklusif.
-*   **Booking History**: Simpanan rekod tempahan yang telah tamat atau dibatalkan untuk penyelidikan.
+**Testing Recommendation:** Please use the **"Paste Direct URL"** option available in the Restaurant, Halal Certificate, and Menu forms. You may paste any publicly accessible image URL from the internet to display images correctly while maintaining real-time synchronization with Firebase.
 
-## 🛠️ Teknologi (Tech Stack)
-*   **Frontend**: Flutter (Dart Framework)
-*   **Backend**: Firebase (Firestore, Auth, Storage)
-*   **Version Control**: GitHub
+---
+
+# 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/aqilosman/HalalFood_App.git
+```
+
+### 2. Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### 3. Run the Application
+
+```bash
+flutter run
+```
+
+---
+
+# ✨ Key Features
+
+- **Halal Verification System** – Restaurant owners can upload or provide a Halal Certificate URL as proof of halal certification.
+- **Hybrid Table Booking** – Manual table reservation system with organized operating hours reference.
+- **Owner Dashboard** – Real-time dashboard displaying booking statistics and customer reviews.
+- **Role-Based Permissions** – Access control to maintain data integrity and allow restaurant owners to manage their own menus.
+- **Booking History** – Stores completed and cancelled bookings for future reference and record management.
+
+---
+
+# 🛠️ Tech Stack
+
+| Category | Technology |
+| :--- | :--- |
+| **Frontend** | Flutter (Dart) |
+| **Backend** | Firebase Authentication, Cloud Firestore, Firebase Storage |
+| **Version Control** | Git & GitHub |
+| **Development Tools** | Android Studio |
+
+---
+
+# 👨‍💻 My Role
+
+**Project Leader**
+
+- Led a team of four members throughout the project development.
+- Coordinated project planning and task allocation.
+- Developed application features using Flutter and Firebase.
+- Managed source code and version control using GitHub.
+
+---
+
+# 🏆 Achievement
+
+🥇 Champion – TECHNOCONNECT 2026 App Development Competition (Universiti Malaysia Kelantan)
+
+---
+
+# 📸 Screenshots
+
+Application screenshots will be added soon.
+
+- Login Screen
+- Home Screen
+- Restaurant Details
+- Booking Page
+- Owner Dashboard
+
+---
+
+# 👤 Author
+
+**Muhammad Aqil Bin Osman**
+
+Information Technology Undergraduate  
+Universiti Malaysia Kelantan
+
+📧 Email: aqilosman2001@gmail.com
+
+💼 LinkedIn: https://linkedin.com/in/aqilosman
+
+🐙 GitHub: https://github.com/aqilosman
